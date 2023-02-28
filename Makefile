@@ -1,4 +1,4 @@
-SRC = my_route_lookup.c io.c io.h utils.c utils.h
+SRC = my_route_lookup.c io.c io.h utils.c utils.h tree.c tree.h
 CFLAGS = -Wall -O3
 
 all: my_route_lookup
