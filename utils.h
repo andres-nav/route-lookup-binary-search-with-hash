@@ -19,6 +19,6 @@ void getNetmask(int prefixLength, int *netmask);
  ********************************************************************/
 int hash(uint32_t IPAddress, int sizeHashTable);
 
-// RL Lab 2020 Switching UC3M
+char max(char a, char b);
 
 #endif // !UTILS_H

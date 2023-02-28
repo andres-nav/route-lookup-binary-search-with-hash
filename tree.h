@@ -4,9 +4,11 @@
 #include <stdint.h>
 
 struct Node {
+  char key;
+  int *table;
   struct Node *left;
   struct Node *right;
-  int table[];
+  char height;
 };
 
 #endif // !TREE_H
