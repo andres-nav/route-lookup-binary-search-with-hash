@@ -1,19 +1,20 @@
 #include "io.h"
 #include "utils.h"
+#include <stdio.h>
 
-/***********************************************************************
+/*
  * Static variables for the input/output files
- ***********************************************************************/
+ */
 static FILE *routingTable;
 static FILE *inputFile;
 static FILE *outputFile;
 
-/***********************************************************************
+/*
  * Write the input to the specified file (f) and the standard output
  *
  * Use as fprintf(FILE *stream, const char *format, ...)
  *
- ***********************************************************************/
+ */
 void tee(FILE *f, char const *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
@@ -24,13 +25,13 @@ void tee(FILE *f, char const *fmt, ...) {
   va_end(ap);
 }
 
-/********************************************************************
+/*
  * Initialize file descriptors
  *
  * routingTableName contains FIB info (argv[1] of main function)
  * inputFileName contains IP addresses (argv[2] of main function)
  *
- ***********************************************************************/
+ */
 int initializeIO(char *routingTableName, char *inputFileName) {
 
   char outputFileName[100];
@@ -56,9 +57,15 @@ int initializeIO(char *routingTableName, char *inputFileName) {
   return OK;
 }
 
-/***********************************************************************
+void resetIO() {
+  rewind(inputFile);
+  rewind(outputFile);
+  rewind(routingTable);
+}
+
+/*
  * Close the input/output files
- ***********************************************************************/
+ */
 void freeIO() {
 
   fclose(inputFile);
@@ -66,9 +73,9 @@ void freeIO() {
   fclose(routingTable);
 }
 
-/***********************************************************************
+/*
  * Write explanation for error identifier (verbose mode)
- ***********************************************************************/
+ */
 void printIOExplanationError(int result) {
 
   switch (result) {
@@ -96,13 +103,13 @@ void printIOExplanationError(int result) {
   }
 }
 
-/***********************************************************************
+/*
  * Read one entry in the FIB
  *
  * It should be noted that prefix, prefixLength and outInterface are
  * pointers since they are used as output parameters
  *
- ***********************************************************************/
+ */
 int readFIBLine(uint32_t *prefix, int *prefixLength, int *outInterface) {
 
   int n[4], result;
@@ -121,13 +128,13 @@ int readFIBLine(uint32_t *prefix, int *prefixLength, int *outInterface) {
   }
 }
 
-/***********************************************************************
+/*
  * Read one entry in the input packet file
  *
  * Again, it should be noted that IPAddress is a pointer since it is used
  * as output parameter
  *
- ***********************************************************************/
+ */
 int readInputPacketFileLine(uint32_t *IPAddress) {
 
   int n[4], result;
@@ -145,7 +152,7 @@ int readInputPacketFileLine(uint32_t *IPAddress) {
   }
 }
 
-/***********************************************************************
+/*
  * Print a line to the output file
  *
  * clock_gettime(CLOCK_MONOTONIC_RAW, &initialTime) must be called right before
@@ -157,7 +164,7 @@ int readInputPacketFileLine(uint32_t *IPAddress) {
  * The lookup function must return (either as output parameter or as return
  *value) the number of hash tables that have been accessed for every IP address
  *
- ***********************************************************************/
+ */
 void printOutputLine(uint32_t IPAddress, int outInterface,
                      struct timespec *initialTime, struct timespec *finalTime,
                      double *searchingTime, int numberOfTableAccesses) {
@@ -188,7 +195,7 @@ void printOutputLine(uint32_t IPAddress, int outInterface,
         *searchingTime);
 }
 
-/***********************************************************************
+/*
  * Print execution summary to the output file
  *
  * It should be noted that:
@@ -198,7 +205,7 @@ void printOutputLine(uint32_t IPAddress, int outInterface,
  *		averagePacketProcessingTime =
  *totalPacketProcessingTime/processedPackets
  *
- ***********************************************************************/
+ */
 void printSummary(int processedPackets, double averageTableAccesses,
                   double averagePacketProcessingTime) {
   tee(outputFile, "\nPackets processed= %i\n", processedPackets);
@@ -208,12 +215,12 @@ void printSummary(int processedPackets, double averageTableAccesses,
   printMemoryTimeUsage();
 }
 
-/***********************************************************************
+/*
  * Print memory and CPU time
  *
  * For more info: man getrusage
  *
- ***********************************************************************/
+ */
 void printMemoryTimeUsage() {
 
   float user_time, system_time;

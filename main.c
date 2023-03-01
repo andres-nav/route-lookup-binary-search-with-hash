@@ -1,14 +1,35 @@
 #include "main.h"
+#include "io.h"
+#include "tree.h"
 
-int main(int argc, char *argv[]) {
-  char keys[15] = {0, 6, 7, 8, 9, 16, 17, 19, 26, 28, 32};
+static struct Node *generateTree() {
+  uint32_t prefix;
+  int prefixLength, outInterface;
+
+  resetIO();
   struct Node *root = NULL;
-  for (int i = 0; i < 15; i++) {
-    root = insertNode(root, keys[i]);
-  }
 
+  while (readFIBLine(&prefix, &prefixLength, &outInterface) != REACHED_EOF) {
+    root = insertNode(root, prefixLength);
+  }
   printTree(root);
 
-  freeTree(root);
+  resetIO();
+  return root;
+}
+
+int main(int argc, char *argv[]) {
+  if (argc != 3) {
+    return -1;
+  }
+  char *fib = argv[1];
+  char *input = argv[2];
+
+  initializeIO(fib, input);
+
+  struct Node *root = NULL;
+  root = generateTree();
+
+  freeIO();
   return 0;
 }

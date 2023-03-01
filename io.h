@@ -40,7 +40,7 @@ void tee(FILE *f, char const *fmt, ...);
  *
  ***********************************************************************/
 int initializeIO(char *routingTableName, char *inputFileName);
-
+void resetIO();
 /***********************************************************************
  * Close the input/output files
  ***********************************************************************/
