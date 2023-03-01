@@ -18,6 +18,7 @@ struct Node {
 struct Node *createNode(char key);
 struct Node *insertNode(struct Node *node, char key);
 struct Node *deleteNode(struct Node *root, int key);
-void printTree(struct Node *node, char space);
+void printTree(struct Node *root);
+struct Node *freeTree(struct Node *root);
 
 #endif // !TREE_H

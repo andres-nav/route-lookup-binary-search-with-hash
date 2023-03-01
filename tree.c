@@ -1,4 +1,5 @@
 #include "tree.h"
+#include <sys/resource.h>
 
 /*
  * Returns the height of the node
@@ -48,11 +49,11 @@ static struct Node *getMinValueNode(struct Node *node) {
 
 /*
  * Rotates to the right the subtree rooted at x
- *     x -- y        x --- TODO
- *     |                |
- *     x ---   =>   --- y
- *         |        |
- *         z        z
+ *     x           --- y
+ *     |           |
+ *     --- y  =>   x ---
+ *         |           |
+ *     z ---           z
  */
 static struct Node *rotateLeft(struct Node *x) {
   if (x == NULL) {
@@ -73,11 +74,11 @@ static struct Node *rotateLeft(struct Node *x) {
 
 /*
  * Rotates to the right the subtree rooted at y
- *     x ---        --- y TODO
- *         |            |
- *      y   =>   x ---
- *         |            |
- *         z            z
+ *     --- y        x ---
+ *     |                |
+ *     x ---   =>   --- y
+ *         |        |
+ *         z        z
  */
 static struct Node *rotateRight(struct Node *y) {
   if (y == NULL) {
@@ -94,6 +95,12 @@ static struct Node *rotateRight(struct Node *y) {
   updateMaxHeightPlusOne(x);
 
   return x;
+}
+
+static struct Node *freeNode(struct Node *node) {
+  free(node);
+  node = NULL;
+  return node;
 }
 
 /*
@@ -114,6 +121,9 @@ struct Node *createNode(char key) {
   return node;
 }
 
+/*
+ * Inserts a node with a specific key
+ */
 struct Node *insertNode(struct Node *node, char key) {
   if (node == NULL) {
     return createNode(key);
@@ -127,9 +137,10 @@ struct Node *insertNode(struct Node *node, char key) {
     return node;
   }
 
-  // Update balance factor
+  // Update the height of the new node
   updateMaxHeightPlusOne(node);
 
+  // Balance the tree
   char balance = getBalanceFactor(node);
   if ((balance > 1) && (key < node->left->key)) {
     return rotateRight(node);
@@ -152,10 +163,14 @@ struct Node *insertNode(struct Node *node, char key) {
   return node;
 }
 
+/*
+ * Deletes a node with a specific key
+ */
 struct Node *deleteNode(struct Node *root, int key) {
   // Find the node and delete it
-  if (root == NULL)
+  if (root == NULL) {
     return root;
+  }
 
   if (key < root->key) {
     root->left = deleteNode(root->left, key);
@@ -168,14 +183,14 @@ struct Node *deleteNode(struct Node *root, int key) {
       if (temp == NULL) {
         temp = root;
         root = NULL;
-      } else
+      } else {
         *root = *temp;
-      free(temp);
+      }
+
+      freeNode(temp);
     } else {
       struct Node *temp = getMinValueNode(root->right);
-
       root->key = temp->key;
-
       root->right = deleteNode(root->right, temp->key);
     }
   }
@@ -183,21 +198,23 @@ struct Node *deleteNode(struct Node *root, int key) {
   if (root == NULL)
     return root;
 
-  // Update the balance factor of each node and
-  // balance the tree
-  root->height = 1 + max(getHeight(root->left), getHeight(root->right));
+  // Update the height of the root
+  updateMaxHeightPlusOne(root);
 
-  int balance = getBalanceFactor(root);
-  if (balance > 1 && getBalanceFactor(root->left) >= 0)
+  // Balance the tree
+  char balance = getBalanceFactor(root);
+  if (balance > 1 && getBalanceFactor(root->left) >= 0) {
     return rotateRight(root);
+  }
 
   if (balance > 1 && getBalanceFactor(root->left) < 0) {
     root->left = rotateLeft(root->left);
     return rotateRight(root);
   }
 
-  if (balance < -1 && getBalanceFactor(root->right) <= 0)
+  if (balance < -1 && getBalanceFactor(root->right) <= 0) {
     return rotateLeft(root);
+  }
 
   if (balance < -1 && getBalanceFactor(root->right) > 0) {
     root->right = rotateRight(root->right);
@@ -207,19 +224,37 @@ struct Node *deleteNode(struct Node *root, int key) {
   return root;
 }
 
-static void printNode(struct Node *node, char space) {}
-
-void printTree(struct Node *root, char space) {
-  int count = 1;
-  if (root == NULL) {
+/*
+ * Print the node and its subtree with padding and identifier
+ */
+static void printNode(struct Node *node, char space, char identifier) {
+  if (node == NULL) {
     return;
   }
-  space += count;
-  printTree(root->right, space);
+  space += 1;
+  printNode(node->right, space, 'R');
 
-  for (int i = count; i < space; i++) {
+  for (int i = 0; i < space; i++) {
     printf("\t");
   }
-  printf("%d\n", root->key);
-  printTree(root->left, space);
+  printf("%d%c\n", node->key, identifier);
+  printNode(node->left, space, 'L');
+}
+
+/*
+ * Print the tree rooted at the node root
+ */
+void printTree(struct Node *root) { printNode(root, 0, 'M'); }
+
+/*
+ * Frees all the tree recursivly
+ */
+struct Node *freeTree(struct Node *root) {
+  if (root == NULL) {
+    return NULL;
+  }
+  freeTree(root->right);
+  freeTree(root->left);
+  freeNode(root);
+  return root;
 }

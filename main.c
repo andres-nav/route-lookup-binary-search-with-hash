@@ -1,15 +1,14 @@
 #include "main.h"
-#include "tree.h"
 
 int main(int argc, char *argv[]) {
-  char keys[10] = {0, 1, 4, 11, 3, 2, 10, 3, 9, 5};
+  char keys[15] = {0, 6, 7, 8, 9, 16, 17, 19, 26, 28, 32};
   struct Node *root = NULL;
-  printTree(root, 0);
-  for (int i = 0; i < 10; i++) {
-    printf("\n-----------\n");
+  for (int i = 0; i < 15; i++) {
     root = insertNode(root, keys[i]);
-    printTree(root, 0);
   }
 
+  printTree(root);
+
+  freeTree(root);
   return 0;
 }
