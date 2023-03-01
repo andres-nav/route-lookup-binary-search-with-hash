@@ -1,14 +1,14 @@
-SRC = my_route_lookup.c io.c io.h utils.c utils.h tree.c tree.h
-CFLAGS = -Wall -O3
+SRC = io.c utils.c tree.c main.c
+CFLAGS = -Wall -g -O3
+OUTPUT_FILE = my_route_lookup
 
-all: my_route_lookup
+all: compile
 
-my_route_lookup: $(SRC)
-	gcc $(CFLAGS) $(SRC) -o my_route_lookup -lm
+compile: $(SRC)
+	gcc $(CFLAGS) $(SRC) -o $(OUTPUT_FILE) -lm
 
 .PHONY: clean
 
 clean:
-	rm -f my_route_lookup
+	rm -f $(OUTPUT_FILE)
 
-#RL Lab 2020 Switching UC3M
