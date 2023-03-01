@@ -108,6 +108,4 @@ void printSummary(int processedPackets, double averageTableAccesses,
  ***********************************************************************/
 void printMemoryTimeUsage();
 
-// RL Lab 2020 Switching UC3M
-//
 #endif // !IO_H

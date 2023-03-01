@@ -12,7 +12,6 @@ static struct Node *generateTree() {
   while (readFIBLine(&prefix, &prefixLength, &outInterface) != REACHED_EOF) {
     root = insertNode(root, prefixLength);
   }
-  printTree(root);
 
   resetIO();
   return root;
@@ -29,6 +28,8 @@ int main(int argc, char *argv[]) {
 
   struct Node *root = NULL;
   root = generateTree();
+  printTree(root);
+  freeTree(root);
 
   freeIO();
   return 0;

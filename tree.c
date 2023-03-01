@@ -1,4 +1,5 @@
 #include "tree.h"
+#include "table.h"
 #include <sys/resource.h>
 
 /*
@@ -98,6 +99,7 @@ static struct Node *rotateRight(struct Node *y) {
 }
 
 static struct Node *freeNode(struct Node *node) {
+  freeTable(node->table);
   free(node);
   node = NULL;
   return node;
@@ -112,8 +114,12 @@ struct Node *createNode(char key) {
     return NULL;
   }
 
+  if ((node->table = createTable(key)) == NULL) {
+    free(node);
+    return NULL;
+  }
+
   node->key = key;
-  node->table = NULL;
   node->left = NULL;
   node->right = NULL;
   node->height = 1;
@@ -225,6 +231,18 @@ struct Node *deleteNode(struct Node *root, int key) {
 }
 
 /*
+ * Frees all the tree recursivly
+ */
+void freeTree(struct Node *root) {
+  if (root == NULL) {
+    return;
+  }
+  freeTree(root->right);
+  freeTree(root->left);
+  freeNode(root);
+}
+
+/*
  * Print the node and its subtree with padding and identifier
  */
 static void printNode(struct Node *node, char space, char identifier) {
@@ -245,16 +263,3 @@ static void printNode(struct Node *node, char space, char identifier) {
  * Print the tree rooted at the node root
  */
 void printTree(struct Node *root) { printNode(root, 0, 'M'); }
-
-/*
- * Frees all the tree recursivly
- */
-struct Node *freeTree(struct Node *root) {
-  if (root == NULL) {
-    return NULL;
-  }
-  freeTree(root->right);
-  freeTree(root->left);
-  freeNode(root);
-  return root;
-}
