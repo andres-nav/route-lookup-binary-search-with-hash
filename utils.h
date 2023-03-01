@@ -1,7 +1,12 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <math.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 /********************************************************************
  * Constant definitions
@@ -20,5 +25,6 @@ void getNetmask(int prefixLength, int *netmask);
 int hash(uint32_t IPAddress, int sizeHashTable);
 
 char max(char a, char b);
+float getSizePrefix(char prefix);
 
 #endif // !UTILS_H

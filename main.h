@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "io.h"
+#include "table.h"
 #include "tree.h"
 
 int main(int argc, char *argv[]);

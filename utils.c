@@ -23,3 +23,5 @@ int hash(uint32_t IPAddress, int sizeHashTable) {
  * Return the max of two integers
  */
 char max(char a, char b) { return (a > b) ? a : b; }
+
+float getSizePrefix(char prefix) { return (powf(2, prefix)); }
