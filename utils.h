@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <math.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,15 @@
  * Constant definitions
  ********************************************************************/
 #define IP_ADDRESS_LENGTH 32
+
+enum Error {
+  OK = 0,
+  ERROR_EMPTY_POINTER = -1,
+  ERROR_MEMORY_ALLOCATION = -2,
+  ERROR_TABLE_DOUBLE_INSERT = -101,
+  ERROR_TABLE_MAX_ATTEMPTS = -102,
+  ERROR_TABLE_NO_ENTRY = -103
+};
 
 /********************************************************************
  * Generate a netmask of length prefixLength
@@ -26,5 +36,7 @@ int hash(uint32_t IPAddress, int sizeHashTable);
 
 char max(char a, char b);
 float getSizePrefix(char prefix);
+
+enum Error raise(enum Error error);
 
 #endif // !UTILS_H

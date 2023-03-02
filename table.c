@@ -1,5 +1,5 @@
 #include "table.h"
-#include <stdint.h>
+#include "utils.h"
 
 /* #define TABLE_SIZE 5000 // number of slots in each table */
 #define TABLE_SIZE 10   // number of slots in each table
@@ -28,6 +28,7 @@ static uint32_t hash2(uint32_t key) {
 struct Table *createTable(char prefix) {
   struct Table *table = (struct Table *)malloc(sizeof(struct Table));
   if (table == NULL) {
+    raise(ERROR_MEMORY_ALLOCATION);
     return NULL;
   }
 
@@ -40,6 +41,7 @@ struct Table *createTable(char prefix) {
         (struct Entry *)calloc(TABLE_SIZE, sizeof(struct Entry));
     if (table->entries[i] == NULL) {
       freeTable(table);
+      raise(ERROR_MEMORY_ALLOCATION);
       return NULL;
     }
 
@@ -59,7 +61,7 @@ struct Table *createTable(char prefix) {
 char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
                 short data) {
   if (table == NULL) {
-    return -1;
+    return raise(ERROR_EMPTY_POINTER);
   }
 
   struct Table *bmp = NULL;
@@ -69,8 +71,7 @@ char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
     uint32_t hash = table->hashFuntion[index](key);
 
     if (table->entries[index][hash].key == key) {
-      printf("Already inside!!!!!!!!!");
-      return -3;
+      return raise(ERROR_TABLE_DOUBLE_INSERT);
     }
 
     if (table->entries[index][hash].label == LABEL_DEFAULT) {
@@ -79,7 +80,7 @@ char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
       table->entries[index][hash].data = data;
       table->entries[index][hash].bmp = bmp;
 
-      return 0;
+      return OK;
     } else {
       uint32_t tmp_key = table->entries[index][hash].key;
       enum EntryLabel tmp_label = table->entries[index][hash].label;
@@ -98,19 +99,17 @@ char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
     }
   }
 
-  printf("Error max attempts %d\n", key);
-
-  return -2;
+  return raise(ERROR_TABLE_MAX_ATTEMPTS);
 }
 
 char deleteData(struct Table *table, uint32_t key) {
   if (table == NULL) {
-    return -1;
+    return raise(ERROR_EMPTY_POINTER);
   }
 
   struct Entry *entry = findEntry(table, key);
   if (entry == NULL) {
-    return -2;
+    return raise(ERROR_TABLE_NO_ENTRY);
   }
 
   entry->key = 0;
@@ -118,11 +117,12 @@ char deleteData(struct Table *table, uint32_t key) {
   entry->data = 0;
   entry->bmp = NULL;
 
-  return 0;
+  return OK;
 }
 
 struct Entry *findEntry(struct Table *table, uint32_t key) {
   if (table == NULL) {
+    raise(ERROR_EMPTY_POINTER);
     return NULL;
   }
 
@@ -138,6 +138,7 @@ struct Entry *findEntry(struct Table *table, uint32_t key) {
 
 void freeTable(struct Table *table) {
   if (table == NULL) {
+    raise(ERROR_EMPTY_POINTER);
     return;
   }
 
@@ -151,6 +152,10 @@ void freeTable(struct Table *table) {
 }
 
 static void printEntries(struct Entry *entries) {
+  if (entries == NULL) {
+    raise(ERROR_EMPTY_POINTER);
+    return;
+  }
   for (unsigned int i = 0; i < TABLE_SIZE; i++) {
     if (entries[i].label != LABEL_DEFAULT) {
       char bmp_prefix = entries[i].bmp == NULL ? -1 : entries[i].bmp->prefix;
@@ -162,6 +167,7 @@ static void printEntries(struct Entry *entries) {
 
 void printTable(struct Table *table) {
   if (table == NULL) {
+    raise(ERROR_EMPTY_POINTER);
     return;
   }
 

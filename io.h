@@ -1,7 +1,6 @@
 #ifndef IO_H
 #define IO_H
 
-#include <stdarg.h>
 #include <sys/resource.h>
 #include <sys/time.h>
 
