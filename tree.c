@@ -114,7 +114,7 @@ struct Node *createNode(char key) {
     return NULL;
   }
 
-  if ((node->table = createTable(key)) == NULL) {
+  if ((node->table = createTable()) == NULL) {
     free(node);
     return NULL;
   }
@@ -172,7 +172,7 @@ struct Node *insertNode(struct Node *node, char key) {
 /*
  * Deletes a node with a specific key
  */
-struct Node *deleteNode(struct Node *root, int key) {
+struct Node *deleteNode(struct Node *root, char key) {
   // Find the node and delete it
   if (root == NULL) {
     return root;
@@ -201,8 +201,9 @@ struct Node *deleteNode(struct Node *root, int key) {
     }
   }
 
-  if (root == NULL)
+  if (root == NULL) {
     return root;
+  }
 
   // Update the height of the root
   updateMaxHeightPlusOne(root);
@@ -228,6 +229,22 @@ struct Node *deleteNode(struct Node *root, int key) {
   }
 
   return root;
+}
+
+struct Table *getTableFromNode(struct Node *root, char key) {
+  if (root == NULL) {
+    return NULL;
+  }
+
+  if (root->key == key) {
+    return root->table;
+  } else if (key < root->key) {
+    return getTableFromNode(root->left, key);
+  } else if (key > root->key) {
+    return getTableFromNode(root->right, key);
+  }
+
+  return NULL;
 }
 
 /*

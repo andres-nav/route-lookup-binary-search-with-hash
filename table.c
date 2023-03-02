@@ -1,7 +1,8 @@
 #include "table.h"
+#include <stdint.h>
 
-#define TABLE_SIZE 1000 // number of slots in each table
-#define MAX_ATTEMPTS 10 // maximum number of attempts to insert a key
+#define TABLE_SIZE 5000 // number of slots in each table
+#define MAX_ATTEMPTS 50 // maximum number of attempts to insert a key
 
 // TODO try to optimize this functions with pointers
 static uint32_t hash1(uint32_t key) {
@@ -23,43 +24,28 @@ static uint32_t hash2(uint32_t key) {
   return hash % TABLE_SIZE;
 }
 
-/* static uint32_t hash3(uint32_t key) { */
-/*   uint32_t hash = key; */
-/*   hash += ~(hash << 15); */
-/*   hash ^= (hash >> 10); */
-/*   hash += (hash << 3); */
-/*   hash ^= (hash >> 6); */
-/*   hash += ~(hash << 11); */
-/*   hash ^= (hash >> 16); */
-/*   return hash % TABLE_SIZE; */
-/* } */
-
-static char findData(short *array, short data) {
-  if (array == NULL) {
-    return -1;
-  }
-
-  for (unsigned int i = 0; i < TABLE_SIZE; i++) {
-    if (array[i] == data) {
-      return i;
-    }
-  }
-
-  return -2;
-}
-
 struct Table *createTable() {
   struct Table *table = (struct Table *)malloc(sizeof(struct Table));
   if (table == NULL) {
     return NULL;
   }
 
-  short *data1 = (short *)calloc(TABLE_SIZE, sizeof(short));
-  short *data2 = (short *)calloc(TABLE_SIZE, sizeof(short));
-  if (((table->data[0] = data1) == NULL) ||
-      ((table->data[1] = data2) == NULL)) {
-    freeTable(table);
-    return NULL;
+  for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
+    table->entries[i] = NULL;
+  }
+
+  for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
+    table->entries[i] =
+        (struct Entry *)calloc(TABLE_SIZE, sizeof(struct Entry));
+    if (table->entries[i] == NULL) {
+      freeTable(table);
+      return NULL;
+    }
+
+    table->entries[i]->key = 0;
+    table->entries[i]->label = LABEL_DEFAULT;
+    table->entries[i]->data = 0;
+    table->entries[i]->bmp = NULL;
   }
 
   table->hashFuntion[0] = hash1;
@@ -68,23 +54,40 @@ struct Table *createTable() {
   return table;
 }
 
-char insertData(struct Table *table, uint32_t key, short data) {
+char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
+                short data) {
   if (table == NULL) {
     return -1;
   }
 
+  struct Table *bmp = NULL;
+
   for (unsigned char i = 0; i < MAX_ATTEMPTS; i++) {
-    unsigned char index = i % 2;
+    unsigned char index = i % NUMBER_TABLES;
     uint32_t hash = table->hashFuntion[index](key);
 
-    if (table->data[index][hash] == 0) {
-      table->data[index][hash] = data;
+    if (table->entries[index][hash].label == LABEL_DEFAULT) {
+      table->entries[index][hash].key = key;
+      table->entries[index][hash].label = label;
+      table->entries[index][hash].data = data;
+      table->entries[index][hash].bmp = bmp;
+
       return 0;
     } else {
-      short tmp = table->data[index][hash];
+      uint32_t tmp_key = table->entries[index][hash].key;
+      enum EntryLabel tmp_label = table->entries[index][hash].label;
+      short tmp_data = table->entries[index][hash].data;
+      struct Table *tmp_bmp = table->entries[index][hash].bmp;
 
-      table->data[index][hash] = data;
-      data = tmp;
+      table->entries[index][hash].key = tmp_key;
+      table->entries[index][hash].label = tmp_label;
+      table->entries[index][hash].data = tmp_data;
+      table->entries[index][hash].bmp = tmp_bmp;
+
+      key = tmp_key;
+      label = tmp_label;
+      data = tmp_data;
+      bmp = tmp_bmp;
     }
   }
 
@@ -98,15 +101,32 @@ char deleteData(struct Table *table, uint32_t key) {
     return -1;
   }
 
-  for (unsigned char i = 0; i < 2; i++) {
-    int index = findData(table->data[i], key);
-    if (index >= 0) {
-      table->data[i][index] = 0;
+  struct Entry *entry = findEntry(table, key);
+  if (entry == NULL) {
+    return -2;
+  }
+
+  entry->key = 0;
+  entry->label = LABEL_DEFAULT;
+  entry->data = 0;
+  entry->bmp = NULL;
+
+  return 0;
+}
+
+struct Entry *findEntry(struct Table *table, uint32_t key) {
+  if (table == NULL) {
+    return NULL;
+  }
+
+  for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
+    uint32_t hash = table->hashFuntion[i](key);
+    if (table->entries[i][hash].key == key) {
+      return &(table->entries[i][hash]);
     }
   }
 
-  printf("Entry not found.\n");
-  return -2;
+  return NULL;
 }
 
 void freeTable(struct Table *table) {
@@ -114,21 +134,19 @@ void freeTable(struct Table *table) {
     return;
   }
 
-  if (table->data[0] != NULL) {
-    free(table->data[0]);
-  }
-
-  if (table->data[1] != NULL) {
-    free(table->data[1]);
+  for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
+    if (table->entries[i] != NULL) {
+      free(table->entries[i]);
+    }
   }
 
   free(table);
 }
 
-static void printData(short *data) {
+static void printEntries(struct Entry *entries) {
   for (unsigned int i = 0; i < TABLE_SIZE; i++) {
-    if (data[i] != 0) {
-      printf("%d\n", data[i]);
+    if (entries[i].data != 0) {
+      printf("%u %d\n", entries[i].label, entries[i].data);
     }
   }
 }
@@ -138,8 +156,8 @@ void printTable(struct Table *table) {
     return;
   }
 
-  for (unsigned char i = 0; i < 2; i++) {
+  for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
     printf("Printing table %u\n", i);
-    printData(table->data[i]);
+    printEntries(table->entries[i]);
   }
 }

@@ -18,7 +18,8 @@ struct Node {
 
 struct Node *createNode(char key);
 struct Node *insertNode(struct Node *node, char key);
-struct Node *deleteNode(struct Node *root, int key);
+struct Node *deleteNode(struct Node *root, char key);
+struct Table *getTableFromNode(struct Node *root, char key);
 void freeTree(struct Node *root);
 void printTree(struct Node *root);
 
