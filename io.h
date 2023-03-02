@@ -6,19 +6,6 @@
 
 #include "utils.h"
 
-/********************************************************************
- * Constant definitions
- ********************************************************************/
-#define OUTPUT_NAME ".out"
-#define OK 0
-#define ROUTING_TABLE_NOT_FOUND -3000
-#define INPUT_FILE_NOT_FOUND -3001
-#define BAD_ROUTING_TABLE -3002
-#define REACHED_EOF -3003
-#define BAD_INPUT_FILE -3004
-#define PARSE_ERROR -3005
-#define CANNOT_CREATE_OUTPUT -3006
-
 /***********************************************************************
  * Write the input to the specified file (f) and the standard output
  *
@@ -34,17 +21,12 @@ void tee(FILE *f, char const *fmt, ...);
  * inputFileName contains IP addresses (argv[2] of main function)
  *
  ***********************************************************************/
-int initializeIO(char *routingTableName, char *inputFileName);
+char initializeIO(char *routingTableName, char *inputFileName);
 void resetIO();
 /***********************************************************************
  * Close the input/output files
  ***********************************************************************/
 void freeIO();
-
-/***********************************************************************
- * Write explanation for error identifier (verbose mode)
- ***********************************************************************/
-void printIOExplanationError(int result);
 
 /***********************************************************************
  * Read one entry in the FIB
@@ -53,7 +35,7 @@ void printIOExplanationError(int result);
  * pointers since they are used as output parameters
  *
  ***********************************************************************/
-int readFIBLine(uint32_t *prefix, int *prefixLength, int *outInterface);
+char readFIBLine(uint32_t *prefix, int *prefixLength, int *outInterface);
 
 /***********************************************************************
  * Read one entry in the input packet file
@@ -62,7 +44,7 @@ int readFIBLine(uint32_t *prefix, int *prefixLength, int *outInterface);
  * as output parameter
  *
  ***********************************************************************/
-int readInputPacketFileLine(uint32_t *IPAddress);
+char readInputPacketFileLine(uint32_t *IPAddress);
 
 /***********************************************************************
  * Print a line to the output file

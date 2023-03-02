@@ -138,7 +138,6 @@ struct Entry *findEntry(struct Table *table, uint32_t key) {
 
 void freeTable(struct Table *table) {
   if (table == NULL) {
-    raise(ERROR_EMPTY_POINTER);
     return;
   }
 

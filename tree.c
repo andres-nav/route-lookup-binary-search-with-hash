@@ -1,6 +1,5 @@
 #include "tree.h"
-#include "table.h"
-#include <sys/resource.h>
+#include "utils.h"
 
 /*
  * Returns the height of the node
@@ -18,11 +17,11 @@ static char getHeight(struct Node *node) {
  */
 static char updateMaxHeightPlusOne(struct Node *node) {
   if (node == NULL) {
-    return -1;
+    return raise(ERROR_EMPTY_POINTER);
   }
 
   node->height = max(getHeight(node->left), getHeight(node->right)) + 1;
-  return 0;
+  return OK;
 }
 
 /*
@@ -30,7 +29,7 @@ static char updateMaxHeightPlusOne(struct Node *node) {
  */
 static char getBalanceFactor(struct Node *node) {
   if (node == NULL) {
-    return 0;
+    return raise(ERROR_EMPTY_POINTER);
   }
 
   return getHeight(node->left) - getHeight(node->right);
@@ -40,6 +39,11 @@ static char getBalanceFactor(struct Node *node) {
  * Computes the minimum value node, that is the most left node
  */
 static struct Node *getMinValueNode(struct Node *node) {
+  if (node == NULL) {
+    raise(ERROR_EMPTY_POINTER);
+    return NULL;
+  }
+
   struct Node *current = node;
 
   while (current->left != NULL)
@@ -58,6 +62,7 @@ static struct Node *getMinValueNode(struct Node *node) {
  */
 static struct Node *rotateLeft(struct Node *x) {
   if (x == NULL) {
+    raise(ERROR_EMPTY_POINTER);
     return NULL;
   }
 
@@ -83,6 +88,7 @@ static struct Node *rotateLeft(struct Node *x) {
  */
 static struct Node *rotateRight(struct Node *y) {
   if (y == NULL) {
+    raise(ERROR_EMPTY_POINTER);
     return NULL;
   }
 
@@ -98,24 +104,32 @@ static struct Node *rotateRight(struct Node *y) {
   return x;
 }
 
-static struct Node *freeNode(struct Node *node) {
+static void freeNode(struct Node *node) {
+  if (node == NULL) {
+    return;
+  }
+
   freeTable(node->table);
   free(node);
-  node = NULL;
-  return node;
 }
 
 /*
  * Creates a new node given the table
  */
 struct Node *createNode(char key) {
+  if (key < 0) {
+    raise(ERROR_WRONG_PARAMETERS);
+    return NULL;
+  }
   struct Node *node = (struct Node *)malloc(sizeof(struct Node));
   if (node == NULL) {
+    raise(ERROR_MEMORY_ALLOCATION);
     return NULL;
   }
 
   if ((node->table = createTable(key)) == NULL) {
-    free(node);
+    raise(ERROR_MEMORY_ALLOCATION);
+    freeNode(node);
     return NULL;
   }
 
@@ -175,7 +189,8 @@ struct Node *insertNode(struct Node *node, char key) {
 struct Node *deleteNode(struct Node *root, char key) {
   // Find the node and delete it
   if (root == NULL) {
-    return root;
+    raise(ERROR_EMPTY_POINTER);
+    return NULL;
   }
 
   if (key < root->key) {
@@ -233,6 +248,7 @@ struct Node *deleteNode(struct Node *root, char key) {
 
 struct Table *getTableFromNode(struct Node *root, char key) {
   if (root == NULL) {
+    raise(ERROR_EMPTY_POINTER);
     return NULL;
   }
 
@@ -244,6 +260,7 @@ struct Table *getTableFromNode(struct Node *root, char key) {
     return getTableFromNode(root->right, key);
   }
 
+  raise(ERROR_NODE_NOT_FOUND);
   return NULL;
 }
 
@@ -254,6 +271,7 @@ void freeTree(struct Node *root) {
   if (root == NULL) {
     return;
   }
+
   freeTree(root->right);
   freeTree(root->left);
   freeNode(root);
@@ -264,6 +282,7 @@ void freeTree(struct Node *root) {
  */
 static void printNode(struct Node *node, char space, char identifier) {
   if (node == NULL) {
+    raise(ERROR_EMPTY_POINTER);
     return;
   }
   space += 1;
@@ -279,6 +298,4 @@ static void printNode(struct Node *node, char space, char identifier) {
 /*
  * Print the tree rooted at the node root
  */
-void printTree(struct Node *root) { 
-	printNode(root, 0, 'M'); 
-}
+void printTree(struct Node *root) { printNode(root, 0, 'M'); }
