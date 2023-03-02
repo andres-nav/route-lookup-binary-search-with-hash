@@ -1,7 +1,8 @@
 #include "table.h"
 #include <stdint.h>
 
-#define TABLE_SIZE 5000 // number of slots in each table
+/* #define TABLE_SIZE 5000 // number of slots in each table */
+#define TABLE_SIZE 10   // number of slots in each table
 #define MAX_ATTEMPTS 50 // maximum number of attempts to insert a key
 
 // TODO try to optimize this functions with pointers
@@ -24,7 +25,7 @@ static uint32_t hash2(uint32_t key) {
   return hash % TABLE_SIZE;
 }
 
-struct Table *createTable() {
+struct Table *createTable(char prefix) {
   struct Table *table = (struct Table *)malloc(sizeof(struct Table));
   if (table == NULL) {
     return NULL;
@@ -48,6 +49,7 @@ struct Table *createTable() {
     table->entries[i]->bmp = NULL;
   }
 
+  table->prefix = prefix;
   table->hashFuntion[0] = hash1;
   table->hashFuntion[1] = hash2;
 
@@ -66,6 +68,11 @@ char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
     unsigned char index = i % NUMBER_TABLES;
     uint32_t hash = table->hashFuntion[index](key);
 
+    if (table->entries[index][hash].key == key) {
+      printf("Already inside!!!!!!!!!");
+      return -3;
+    }
+
     if (table->entries[index][hash].label == LABEL_DEFAULT) {
       table->entries[index][hash].key = key;
       table->entries[index][hash].label = label;
@@ -79,10 +86,10 @@ char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
       short tmp_data = table->entries[index][hash].data;
       struct Table *tmp_bmp = table->entries[index][hash].bmp;
 
-      table->entries[index][hash].key = tmp_key;
-      table->entries[index][hash].label = tmp_label;
-      table->entries[index][hash].data = tmp_data;
-      table->entries[index][hash].bmp = tmp_bmp;
+      table->entries[index][hash].key = key;
+      table->entries[index][hash].label = label;
+      table->entries[index][hash].data = data;
+      table->entries[index][hash].bmp = bmp;
 
       key = tmp_key;
       label = tmp_label;
@@ -145,8 +152,10 @@ void freeTable(struct Table *table) {
 
 static void printEntries(struct Entry *entries) {
   for (unsigned int i = 0; i < TABLE_SIZE; i++) {
-    if (entries[i].data != 0) {
-      printf("%u %d\n", entries[i].label, entries[i].data);
+    if (entries[i].label != LABEL_DEFAULT) {
+      char bmp_prefix = entries[i].bmp == NULL ? -1 : entries[i].bmp->prefix;
+      printf("\tL:%u K:%d BMP:%d D:%d\n", entries[i].label, entries[i].key,
+             bmp_prefix, entries[i].data);
     }
   }
 }

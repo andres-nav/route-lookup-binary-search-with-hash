@@ -114,7 +114,7 @@ struct Node *createNode(char key) {
     return NULL;
   }
 
-  if ((node->table = createTable()) == NULL) {
+  if ((node->table = createTable(key)) == NULL) {
     free(node);
     return NULL;
   }
@@ -279,4 +279,6 @@ static void printNode(struct Node *node, char space, char identifier) {
 /*
  * Print the tree rooted at the node root
  */
-void printTree(struct Node *root) { printNode(root, 0, 'M'); }
+void printTree(struct Node *root) { 
+	printNode(root, 0, 'M'); 
+}

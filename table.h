@@ -20,11 +20,12 @@ struct Entry {
 };
 
 struct Table {
+  char prefix;
   struct Entry *entries[NUMBER_TABLES];
   uint32_t (*hashFuntion[NUMBER_TABLES])(uint32_t key);
 };
 
-struct Table *createTable();
+struct Table *createTable(char prefix);
 char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
                 short data);
 char deleteData(struct Table *table, uint32_t key);
