@@ -51,6 +51,8 @@ int hash(uint32_t IPAddress, int sizeHashTable);
 char max(char a, char b);
 float getSizePrefix(char prefix);
 
+void getIPString(char **string, uint32_t ip);
+
 enum Error raise(enum Error error);
 
 #endif // !UTILS_H

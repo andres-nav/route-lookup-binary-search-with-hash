@@ -26,6 +26,11 @@ char max(char a, char b) { return (a > b) ? a : b; }
 
 float getSizePrefix(char prefix) { return (powf(2, prefix)); }
 
+void getIPString(char **string, uint32_t ip) {
+  sprintf(*string, "%i.%i.%i.%i", ip >> 24, (ip >> 16) & 0x000000ff,
+          (ip >> 8) & 0x000000ff, ip & 0x000000ff);
+}
+
 static void printError(const char *format, ...) {
   va_list ap;
   va_start(ap, format);

@@ -34,6 +34,8 @@ static void fillTreeWithPrefixes(struct Node *root) {
   }
 }
 
+static void addMarkers(struct Node *root) {}
+
 int main(int argc, char *argv[]) {
   if (argc != 3) {
     return -1;
@@ -45,14 +47,10 @@ int main(int argc, char *argv[]) {
 
   struct Node *root = NULL;
   root = generateTree();
-  printTree(root);
 
   fillTreeWithPrefixes(root);
 
-  for (int i = 0; i < 33; i++) {
-    printf("\nPREFIX %d\n", i);
-    printTable(getTableFromNode(root, i));
-  }
+  printTree(root);
 
   freeTree(root);
 

@@ -1,4 +1,5 @@
 #include "tree.h"
+#include "table.h"
 #include "utils.h"
 
 /*
@@ -293,7 +294,23 @@ static void printNode(struct Node *node, char space, char identifier) {
   printNode(node->left, space, 'L');
 }
 
+static void printTreeTables(struct Node *node) {
+  if (node == NULL) {
+    return;
+  }
+
+  printTreeTables(node->left);
+
+  printf("\n PREFIX %u\n", node->key);
+  printTable(node->table);
+
+  printTreeTables(node->right);
+}
+
 /*
  * Print the tree rooted at the node root
  */
-void printTree(struct Node *root) { printNode(root, 0, 'M'); }
+void printTree(struct Node *root) {
+  printNode(root, 0, 'M');
+  printTreeTables(root);
+}
