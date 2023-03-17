@@ -1,6 +1,4 @@
 #include "../table.h"
-
-#include "../table.h"
 #include "miniunit.h"
 #include <stdint.h>
 
@@ -19,7 +17,7 @@
  * 	L:1 K:1172 BMP:-1 D:6
  * 	L:1 K:769 BMP:-1 D:1
  */
-static char test_create_table() {
+static char testCreateTable() {
   struct Table *table = createTable(16);
   if (table == NULL) {
     printf("error\n");
@@ -29,7 +27,7 @@ static char test_create_table() {
   uint32_t ip[11] = {0x0000, 0x0301, 0x0303, 0x2300, 0xAAAA, 0x0231,
                      0x0494, 0x2039, 0x0230, 0x1234, 0xAAAA};
 
-  for (char i = 0; i < 11; i++) {
+  for (unsigned char i = 0; i < 11; i++) {
     insertData(table, ip[i], LABEL_PREFIX, i);
   }
   printTable(table);
@@ -39,6 +37,6 @@ static char test_create_table() {
   return 0;
 }
 
-void test_table() {
-  test_case("TABLE", { expect("create table", test_create_table() == 0); });
+void testTable() {
+  test_case("TABLE", { expect("create table", testCreateTable() == 0); });
 }

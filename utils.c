@@ -3,9 +3,21 @@
 /********************************************************************
  * Generate a netmask of length prefixLength
  ********************************************************************/
-void getNetmask(int prefixLength, int *netmask) {
+void getNetmask(unsigned char prefixLength, uint32_t *netmask) {
 
   *netmask = (0xFFFFFFFF << (IP_ADDRESS_LENGTH - prefixLength));
+}
+
+void getPrefix(uint32_t ip, char prefixLength, uint32_t *prefix) {
+  if ((prefixLength < 1) || (prefixLength > IP_ADDRESS_LENGTH)) {
+    *prefix = 0;
+    return;
+  }
+
+  uint32_t netmask = 0;
+  getNetmask(prefixLength, &netmask);
+
+  *prefix = ip & netmask;
 }
 
 /********************************************************************
@@ -27,8 +39,8 @@ char max(char a, char b) { return (a > b) ? a : b; }
 float getSizePrefix(char prefix) { return (powf(2, prefix)); }
 
 void getIPString(char **string, uint32_t ip) {
-  sprintf(*string, "%i.%i.%i.%i", ip >> 24, (ip >> 16) & 0x000000ff,
-          (ip >> 8) & 0x000000ff, ip & 0x000000ff);
+  sprintf(*string, "%u.%u.%u.%u", ip >> 24, (ip >> 16) & 0xff, (ip >> 8) & 0xff,
+          ip & 0xff);
 }
 
 static void printError(const char *format, ...) {

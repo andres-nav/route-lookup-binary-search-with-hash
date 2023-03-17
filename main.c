@@ -1,6 +1,7 @@
 #include "main.h"
 #include "table.h"
 #include "tree.h"
+#include "utils.h"
 
 static struct Node *generateTree() {
   uint32_t prefix;
@@ -17,19 +18,20 @@ static struct Node *generateTree() {
 }
 
 static void fillTreeWithPrefixes(struct Node *root) {
-  uint32_t prefix;
+  uint32_t ip, prefix;
   int prefixLength, outInterface;
 
   resetIO();
 
   int previousPrefixLength = -1;
-  struct Table *table;
+  struct Table *table = NULL;
 
-  while (readFIBLine(&prefix, &prefixLength, &outInterface) != REACHED_EOF) {
+  while (readFIBLine(&ip, &prefixLength, &outInterface) != REACHED_EOF) {
     if (prefixLength != previousPrefixLength) {
       table = getTableFromNode(root, prefixLength);
     }
 
+    getPrefix(ip, prefixLength, &prefix);
     insertData(table, prefix, LABEL_PREFIX, outInterface);
   }
 }

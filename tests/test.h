@@ -1,5 +1,6 @@
 #ifndef _TEST_H
 
-void test_table();
+void testTable();
+void testUtils();
 
 #endif // !_TEST_H

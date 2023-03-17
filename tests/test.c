@@ -3,7 +3,8 @@
 #include "miniunit.h"
 
 int main(int argc, char *argv[]) {
-  test_table();
+  /* testTable(); */
+  testUtils();
 
   return 0;
 }

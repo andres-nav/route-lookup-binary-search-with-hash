@@ -40,7 +40,9 @@ enum Error {
 /********************************************************************
  * Generate a netmask of length prefixLength
  ********************************************************************/
-void getNetmask(int prefixLength, int *netmask);
+void getNetmask(unsigned char prefixLength, uint32_t *netmask);
+
+void getPrefix(uint32_t ip, char prefixLength, uint32_t *prefix);
 
 /********************************************************************
  * Example of a very simple hash function using the modulus operator
