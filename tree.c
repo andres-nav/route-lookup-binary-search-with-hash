@@ -248,7 +248,7 @@ struct Node *deleteNode(struct Node *root, char key) {
 
 struct Table *getTableFromNode(struct Node *root, char key) {
   if (root == NULL) {
-    raise(ERROR_EMPTY_POINTER);
+    raise(ERROR_NODE_NOT_FOUND);
     return NULL;
   }
 
@@ -260,7 +260,6 @@ struct Table *getTableFromNode(struct Node *root, char key) {
     return getTableFromNode(root->right, key);
   }
 
-  raise(ERROR_NODE_NOT_FOUND);
   return NULL;
 }
 
@@ -282,7 +281,6 @@ void freeTree(struct Node *root) {
  */
 static void printNode(struct Node *node, char space, char identifier) {
   if (node == NULL) {
-    raise(ERROR_EMPTY_POINTER);
     return;
   }
   space += 1;

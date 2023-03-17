@@ -45,7 +45,7 @@ struct Table *createTable(char prefix) {
       return NULL;
     }
 
-    table->entries[i]->key = 0;
+    table->entries[i]->key = -1;
     table->entries[i]->label = LABEL_DEFAULT;
     table->entries[i]->data = 0;
     table->entries[i]->bmp = NULL;
@@ -152,13 +152,12 @@ void freeTable(struct Table *table) {
 
 static void printEntries(struct Entry *entries) {
   if (entries == NULL) {
-    raise(ERROR_EMPTY_POINTER);
     return;
   }
   for (unsigned int i = 0; i < TABLE_SIZE; i++) {
     if (entries[i].label != LABEL_DEFAULT) {
       char bmp_prefix = entries[i].bmp == NULL ? -1 : entries[i].bmp->prefix;
-      printf("\tL:%u K:%d BMP:%d D:%d\n", entries[i].label, entries[i].key,
+      printf("\tL:%u K:%u BMP:%d D:%d\n", entries[i].label, entries[i].key,
              bmp_prefix, entries[i].data);
     }
   }
@@ -166,7 +165,6 @@ static void printEntries(struct Entry *entries) {
 
 void printTable(struct Table *table) {
   if (table == NULL) {
-    raise(ERROR_EMPTY_POINTER);
     return;
   }
 

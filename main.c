@@ -30,52 +30,32 @@ static void fillTreeWithPrefixes(struct Node *root) {
       table = getTableFromNode(root, prefixLength);
     }
 
-    insertData(table, prefix, outInterface, LABEL_PREFIX);
+    insertData(table, prefix, LABEL_PREFIX, outInterface);
   }
 }
 
-/* int main(int argc, char *argv[]) { */
-/*   if (argc != 3) { */
-/*     return -1; */
-/*   } */
-/*   char *fib = argv[1]; */
-/*   char *input = argv[2]; */
-/**/
-/*   initializeIO(fib, input); */
-/**/
-/*   struct Node *root = NULL; */
-/*   root = generateTree(); */
-/*   printTree(root); */
-/**/
-/*   fillTreeWithPrefixes(root); */
-/**/
-/*   for (int i = 0; i < 33; i++) { */
-/*     printf("prefix %d\n", i); */
-/*     printTable(getTableFromNode(root, i)); */
-/*   } */
-/**/
-/*   freeTree(root); */
-/**/
-/*   freeIO(); */
-/*   return 0; */
-/* } */
-
-int main(int argc, char **argv) {
-  struct Table *table = createTable(16);
-  if (table == NULL) {
-    printf("error\n");
+int main(int argc, char *argv[]) {
+  if (argc != 3) {
     return -1;
   }
+  char *fib = argv[1];
+  char *input = argv[2];
 
-  uint32_t ip[11] = {0xFFA1, 0x0301, 0x0303, 0x2300, 0xAAAA, 0x0231,
-                     0x0494, 0x2039, 0x0230, 0x1234, 0xAAAA};
+  initializeIO(fib, input);
 
-  for (char i = 0; i < 11; i++) {
-    insertData(table, ip[i], LABEL_PREFIX, i);
-    printTable(table);
+  struct Node *root = NULL;
+  root = generateTree();
+  printTree(root);
+
+  fillTreeWithPrefixes(root);
+
+  for (int i = 0; i < 33; i++) {
+    printf("\nPREFIX %d\n", i);
+    printTable(getTableFromNode(root, i));
   }
 
-  freeTable(table);
+  freeTree(root);
 
+  freeIO();
   return 0;
 }
