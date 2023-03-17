@@ -154,6 +154,7 @@ static void printEntries(struct Entry *entries) {
   if (entries == NULL) {
     return;
   }
+
   for (unsigned int i = 0; i < TABLE_SIZE; i++) {
     if (entries[i].label != LABEL_DEFAULT) {
       char bmp_prefix = entries[i].bmp == NULL ? -1 : entries[i].bmp->prefix;
@@ -161,7 +162,7 @@ static void printEntries(struct Entry *entries) {
       char *ip = malloc(16 * sizeof(char));
       getIPString(&ip, entries[i].key);
 
-      printf("\tL:%u K:%s BMP:%d D:%d\n", entries[i].label, ip, bmp_prefix,
+      printf("\t\tL:%u K:%s BMP:%d D:%d\n", entries[i].label, ip, bmp_prefix,
              entries[i].data);
 
       free(ip);
@@ -175,7 +176,7 @@ void printTable(struct Table *table) {
   }
 
   for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
-    printf("Printing table %u\n", i);
+    printf("\tPrinting table %u\n", i);
     printEntries(table->entries[i]);
   }
 }
