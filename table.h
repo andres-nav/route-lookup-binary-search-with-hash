@@ -9,20 +9,19 @@ enum EntryLabel {
   LABEL_DEFAULT = 0,
   LABEL_PREFIX = 1,
   LABEL_MARK = 2,
-  LABEL_PREFIX_MARK = 3,
 };
 
 struct Entry {
   uint32_t key;
   enum EntryLabel label;
   short data;
-  struct Table *bmp;
 };
 
 struct Table {
   char prefix;
+  unsigned int size;
   struct Entry *entries[NUMBER_TABLES];
-  uint32_t (*hashFuntion[NUMBER_TABLES])(uint32_t key);
+  uint32_t (*hashFuntion[NUMBER_TABLES])(uint32_t key, unsigned int table_size);
 };
 
 struct Table *createTable(char prefix);

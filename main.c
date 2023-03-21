@@ -2,6 +2,7 @@
 #include "table.h"
 #include "tree.h"
 #include "utils.h"
+#include <stdint.h>
 
 static struct Node *generateTree() {
   uint32_t prefix;
@@ -18,6 +19,11 @@ static struct Node *generateTree() {
 }
 
 static void fillTreeWithPrefixes(struct Node *root) {
+  if (root == NULL) {
+    raise(ERROR_NODE_NOT_FOUND);
+    return;
+  }
+
   uint32_t ip, prefix;
   int prefixLength, outInterface;
 
@@ -36,7 +42,57 @@ static void fillTreeWithPrefixes(struct Node *root) {
   }
 }
 
-static void addMarkers(struct Node *root) {}
+static void addMarkersFromTableToNode(struct Node *node, struct Table *table) {
+  for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
+    if (table->entries[i] == NULL) {
+      continue;
+    }
+
+    struct Entry *entry_array = table->entries[i];
+    uint32_t key = 0;
+
+    for (unsigned int j = 0; j < table->size; j++) {
+      if (entry_array[j].label != LABEL_DEFAULT) {
+        getPrefix(entry_array[j].key, node->key, &key);
+
+        insertData(node->table, key, LABEL_MARK, -1);
+      }
+    }
+  }
+}
+
+static void computeMarkersForSubtree(struct Node *node) {
+  printf("computing markers for %u\n", node->key);
+  if (node == NULL) {
+    return;
+  }
+
+  if (node->right == NULL) {
+    return;
+  }
+
+  computeMarkersForSubtree(node->right);
+  addMarkersFromTableToNode(node, node->right->table);
+
+  struct Node *left_node = node->right->left;
+  while (left_node != NULL) {
+    computeMarkersForSubtree(left_node);
+    addMarkersFromTableToNode(node, left_node->table);
+    left_node = left_node->left;
+  }
+}
+
+static void fillTreeWithMarkers(struct Node *root) {
+  if (root == NULL) {
+    raise(ERROR_NODE_NOT_FOUND);
+    return;
+  }
+
+  do {
+    computeMarkersForSubtree(root);
+    printf("done for subtree %u\n", root->key);
+  } while ((root = root->left) != NULL);
+}
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
@@ -51,6 +107,7 @@ int main(int argc, char *argv[]) {
   root = generateTree();
 
   fillTreeWithPrefixes(root);
+  fillTreeWithMarkers(root);
 
   printTree(root);
 
