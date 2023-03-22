@@ -70,7 +70,7 @@ char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
     uint32_t hash = table->hashFuntion[index](key, table->size);
 
     if (table->entries[index][hash].key == key) {
-      return raise(ERROR_TABLE_DOUBLE_INSERT);
+      return ERROR_TABLE_DOUBLE_INSERT;
     }
 
     if (table->entries[index][hash].label == LABEL_DEFAULT) {

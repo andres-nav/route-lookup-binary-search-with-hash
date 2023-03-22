@@ -62,7 +62,6 @@ static void addMarkersFromTableToNode(struct Node *node, struct Table *table) {
 }
 
 static void computeMarkersForSubtree(struct Node *node) {
-  printf("computing markers for %u\n", node->key);
   if (node == NULL) {
     return;
   }
@@ -90,7 +89,6 @@ static void fillTreeWithMarkers(struct Node *root) {
 
   do {
     computeMarkersForSubtree(root);
-    printf("done for subtree %u\n", root->key);
   } while ((root = root->left) != NULL);
 }
 
