@@ -172,26 +172,20 @@ static void fillTreeWithBmp(struct Node *root) {
   computeBMPForSubtree(root, root);
 }
 
-static unsigned short findLongestMatchingPrefix(struct Node *root,
-                                                uint32_t ip) {
-  if (root == NULL) {
-    raise(ERROR_EMPTY_POINTER);
-    return -1; // TODO fix to constant
-  }
-
-  unsigned short lmp = -1;
+static void findLongestMatchingPrefix(struct Node *root, uint32_t ip,
+                                      unsigned short *outInterface,
+                                      unsigned char *tableAccesses) {
   struct Entry *entry = NULL;
   do {
     entry = findEntry(root->table, ip);
+    (*tableAccesses)++;
     if (entry == NULL) {
       root = root->left;
     } else {
-      lmp = entry->data;
+      *outInterface = entry->data;
       root = root->right;
     }
   } while (root != NULL);
-
-  return lmp;
 }
 
 static void computeLMPForInputPakcetFile(struct Node *root) {
@@ -203,23 +197,31 @@ static void computeLMPForInputPakcetFile(struct Node *root) {
   resetIO();
 
   uint32_t ip;
-  unsigned char outInterface;
+  unsigned short outInterface;
+  unsigned char tableAccesses;
   struct timespec initialTime, finalTime;
   double searchTime, totalTime = 0;
-  unsigned int processedPackets = 0;
+  unsigned int processedPackets = 0, totalTableAccesses = 0;
 
   while (readInputPacketFileLine(&ip) != REACHED_EOF) {
+    outInterface = -1;
+    tableAccesses = 0;
+
     clock_gettime(CLOCK_MONOTONIC_RAW, &initialTime);
-    outInterface = findLongestMatchingPrefix(root, ip);
+    findLongestMatchingPrefix(root, ip, &outInterface, &tableAccesses);
     clock_gettime(CLOCK_MONOTONIC_RAW, &finalTime);
 
     // TODO change search time
-    printOutputLine(ip, outInterface, &initialTime, &finalTime, &searchTime, 0);
+    printOutputLine(ip, outInterface, &initialTime, &finalTime, &searchTime,
+                    tableAccesses);
     totalTime += searchTime;
+    totalTableAccesses += tableAccesses;
     processedPackets++;
   }
 
-  printSummary(processedPackets, 0, (totalTime / processedPackets));
+  printSummary(processedPackets,
+               ((double)totalTableAccesses / processedPackets),
+               (totalTime / processedPackets));
 }
 
 int main(int argc, char *argv[]) {
@@ -237,6 +239,8 @@ int main(int argc, char *argv[]) {
   fillTreeWithPrefixes(root);
   fillTreeWithMarkers(root);
   fillTreeWithBmp(root);
+
+  printTree(root);
 
   computeLMPForInputPakcetFile(root);
 
