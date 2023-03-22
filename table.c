@@ -77,7 +77,8 @@ char insertData(struct Table *table, uint32_t ip, enum EntryLabel label,
   for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
     uint32_t hash = table->hashFuntion[i](key, table->size);
 
-    if (table->entries[i][hash].key == key) {
+    if ((table->entries[i][hash].key == key) &&
+        (table->entries[i][hash].label != LABEL_DEFAULT)) {
       return ERROR_TABLE_DOUBLE_INSERT;
     }
   }
@@ -145,7 +146,8 @@ struct Entry *findEntry(struct Table *table, uint32_t ip) {
 
   for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
     uint32_t hash = table->hashFuntion[i](key, table->size);
-    if (table->entries[i][hash].key == key) {
+    if ((table->entries[i][hash].key == key) &&
+        (table->entries[i][hash].label != LABEL_DEFAULT)) {
       return &(table->entries[i][hash]);
     }
   }

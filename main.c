@@ -97,11 +97,85 @@ static void fillTreeWithMarkers(struct Node *root) {
   } while ((root = root->left) != NULL);
 }
 
+static unsigned short findBestMatchingPrefix(struct Node *root, uint32_t ip,
+                                             unsigned char prefix) {
+  if (root == NULL) {
+    raise(ERROR_EMPTY_POINTER);
+    return -1; // TODO fix to constant
+  }
+
+  unsigned short lmp = -1;
+  struct Entry *entry = NULL;
+  do {
+    if (root->key >= prefix) {
+      root = root->left;
+      continue;
+    }
+
+    entry = findEntry(root->table, ip);
+    if (entry == NULL) {
+      root = root->left;
+    } else {
+      lmp = entry->data;
+      root = root->right;
+    }
+  } while (root != NULL);
+
+  return lmp;
+}
+
+static void addBMPToTable(struct Table *table, struct Node *root) {
+  if ((root == NULL) || (table == NULL)) {
+    raise(ERROR_EMPTY_POINTER);
+    return;
+  }
+
+  for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
+    if (table->entries[i] == NULL) {
+      continue;
+    }
+
+    struct Entry *entry_array = table->entries[i];
+
+    for (unsigned int j = 0; j < table->size; j++) {
+      if (entry_array[j].label == LABEL_MARKER) {
+        unsigned short lmp =
+            findBestMatchingPrefix(root, entry_array[j].key, table->prefix);
+        if (lmp != 0xff) {
+          entry_array[j].data = lmp;
+          entry_array[j].label = LABEL_MARKER_WITH_BMP;
+        }
+      }
+    }
+  }
+}
+
+static void computeBMPForSubtree(struct Node *node, struct Node *root) {
+  if (node == NULL) {
+    return;
+  }
+
+  computeBMPForSubtree(node->left, root);
+
+  addBMPToTable(node->table, root);
+
+  computeBMPForSubtree(node->right, root);
+}
+
+static void fillTreeWithBmp(struct Node *root) {
+  if (root == NULL) {
+    raise(ERROR_EMPTY_POINTER);
+    return;
+  }
+
+  computeBMPForSubtree(root, root);
+}
+
 static unsigned short findLongestMatchingPrefix(struct Node *root,
                                                 uint32_t ip) {
   if (root == NULL) {
     raise(ERROR_EMPTY_POINTER);
-    return -1;
+    return -1; // TODO fix to constant
   }
 
   unsigned short lmp = -1;
@@ -115,7 +189,6 @@ static unsigned short findLongestMatchingPrefix(struct Node *root,
       root = root->right;
     }
   } while (root != NULL);
-  printf("lmp: %u ip: %u", lmp, ip);
 
   return lmp;
 }
@@ -134,6 +207,7 @@ int main(int argc, char *argv[]) {
 
   fillTreeWithPrefixes(root);
   fillTreeWithMarkers(root);
+  fillTreeWithBmp(root);
 
   printTree(root);
 

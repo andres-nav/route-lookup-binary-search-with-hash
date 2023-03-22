@@ -15,6 +15,11 @@ void getPrefix(uint32_t ip, char prefixLength, uint32_t *prefix) {
     return;
   }
 
+  if (prefixLength == 0) {
+    *prefix = 0;
+    return;
+  }
+
   uint32_t netmask = 0;
   getNetmask(prefixLength, &netmask);
 
