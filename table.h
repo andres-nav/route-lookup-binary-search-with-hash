@@ -27,7 +27,7 @@ struct Table {
 
 struct Table *createTable(char prefix);
 char insertData(struct Table *table, uint32_t ip, enum EntryLabel label,
-                short data);
+                unsigned short data);
 char deleteData(struct Table *table, uint32_t key);
 struct Entry *findEntry(struct Table *table, uint32_t key);
 void freeTable(struct Table *table);

@@ -66,7 +66,7 @@ struct Table *createTable(char prefix) {
 
 // TODO when max attempt is reached resize the table
 char insertData(struct Table *table, uint32_t ip, enum EntryLabel label,
-                short data) {
+                unsigned short data) {
   if (table == NULL) {
     return raise(ERROR_EMPTY_POINTER);
   }

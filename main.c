@@ -33,6 +33,10 @@ static void fillTreeWithPrefixes(struct Node *root) {
   struct Table *table = NULL;
 
   while (readFIBLine(&ip, &prefixLength, &outInterface) != REACHED_EOF) {
+    if ((outInterface < 0) || (outInterface >= 0xff)) {
+      raise(ERROR_IO_OUTPUT_INTERFACE);
+      continue;
+    }
     if (prefixLength != previousPrefixLength) {
       table = getTableFromNode(root, prefixLength);
     }
@@ -51,7 +55,7 @@ static void addMarkersFromTableToNode(struct Node *node, struct Table *table) {
 
     for (unsigned int j = 0; j < table->size; j++) {
       if (entry_array[j].label != LABEL_DEFAULT) {
-        insertData(node->table, entry_array[j].key, LABEL_MARK, -1);
+        insertData(node->table, entry_array[j].key, LABEL_MARKER, -1);
       }
     }
   }
@@ -79,13 +83,36 @@ static void computeMarkersForSubtree(struct Node *node) {
 
 static void fillTreeWithMarkers(struct Node *root) {
   if (root == NULL) {
-    raise(ERROR_NODE_NOT_FOUND);
+    raise(ERROR_EMPTY_POINTER);
     return;
   }
 
   do {
     computeMarkersForSubtree(root);
   } while ((root = root->left) != NULL);
+}
+
+static unsigned short findLongestMatchingPrefix(struct Node *root,
+                                                uint32_t ip) {
+  if (root == NULL) {
+    raise(ERROR_EMPTY_POINTER);
+    return -1;
+  }
+
+  unsigned short lmp = -1;
+  struct Entry *entry = NULL;
+  do {
+    entry = findEntry(root->table, ip);
+    if (entry == NULL) {
+      root = root->left;
+    } else {
+      lmp = entry->data;
+      root = root->right;
+    }
+  } while (root != NULL);
+  printf("lmp: %u ip: %u", lmp, ip);
+
+  return lmp;
 }
 
 int main(int argc, char *argv[]) {
@@ -101,7 +128,6 @@ int main(int argc, char *argv[]) {
   root = generateTree();
 
   fillTreeWithPrefixes(root);
-  printTree(root);
   fillTreeWithMarkers(root);
 
   printTree(root);

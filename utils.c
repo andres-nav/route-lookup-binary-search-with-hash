@@ -21,17 +21,6 @@ void getPrefix(uint32_t ip, char prefixLength, uint32_t *prefix) {
   *prefix = ip & netmask;
 }
 
-/********************************************************************
- * Example of a very simple hash function using the modulus operator
- * For more info: https://gist.github.com/cpq/8598442
- ********************************************************************/
-int hash(uint32_t IPAddress, int sizeHashTable) {
-
-  // Map the key (IPAddress) to the appropriate index of the hash table
-  int index = IPAddress % sizeHashTable;
-  return (index);
-}
-
 /*
  * Return the max of two integers
  */
@@ -103,6 +92,9 @@ enum Error raise(enum Error error) {
     break;
   case ERROR_IO_CANNOT_CREATE_OUTPUT:
     printError("Could not create the output file");
+    break;
+  case ERROR_IO_OUTPUT_INTERFACE:
+    printError("The output interface does not fit in data");
     break;
   }
 

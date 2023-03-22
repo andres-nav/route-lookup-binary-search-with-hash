@@ -13,6 +13,7 @@
  * Constant definitions
  ********************************************************************/
 #define IP_ADDRESS_LENGTH 32
+// TODO define empty constant for -1
 
 enum Error {
   OK = 0,
@@ -35,6 +36,7 @@ enum Error {
   ERROR_IO_BAD_INPUT_FILE = -304,
   ERROR_IO_PARSE_ERROR = -305,
   ERROR_IO_CANNOT_CREATE_OUTPUT = -306,
+  ERROR_IO_OUTPUT_INTERFACE = -307,
 
 };
 
