@@ -24,7 +24,7 @@ static void fillTreeWithPrefixes(struct Node *root) {
     return;
   }
 
-  uint32_t ip, prefix;
+  uint32_t ip;
   int prefixLength, outInterface;
 
   resetIO();
@@ -37,8 +37,7 @@ static void fillTreeWithPrefixes(struct Node *root) {
       table = getTableFromNode(root, prefixLength);
     }
 
-    getPrefix(ip, prefixLength, &prefix);
-    insertData(table, prefix, LABEL_PREFIX, outInterface);
+    insertData(table, ip, LABEL_PREFIX, outInterface);
   }
 }
 
@@ -49,13 +48,10 @@ static void addMarkersFromTableToNode(struct Node *node, struct Table *table) {
     }
 
     struct Entry *entry_array = table->entries[i];
-    uint32_t key = 0;
 
     for (unsigned int j = 0; j < table->size; j++) {
       if (entry_array[j].label != LABEL_DEFAULT) {
-        getPrefix(entry_array[j].key, node->key, &key);
-
-        insertData(node->table, key, LABEL_MARK, -1);
+        insertData(node->table, entry_array[j].key, LABEL_MARK, -1);
       }
     }
   }
@@ -105,6 +101,7 @@ int main(int argc, char *argv[]) {
   root = generateTree();
 
   fillTreeWithPrefixes(root);
+  printTree(root);
   fillTreeWithMarkers(root);
 
   printTree(root);

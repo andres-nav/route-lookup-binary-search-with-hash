@@ -9,8 +9,9 @@ void getNetmask(unsigned char prefixLength, uint32_t *netmask) {
 }
 
 void getPrefix(uint32_t ip, char prefixLength, uint32_t *prefix) {
-  if ((prefixLength < 1) || (prefixLength > IP_ADDRESS_LENGTH)) {
+  if ((prefixLength < 0) || (prefixLength > IP_ADDRESS_LENGTH)) {
     *prefix = 0;
+    raise(ERROR_WRONG_PREFIX);
     return;
   }
 
@@ -66,6 +67,9 @@ enum Error raise(enum Error error) {
     break;
   case ERROR_WRONG_PARAMETERS:
     printError("The parameters of the functions are not correct");
+    break;
+  case ERROR_WRONG_PREFIX:
+    printError("The prefix given is hiehger than 32 or lower than 0");
     break;
 
   case ERROR_TABLE_DOUBLE_INSERT:

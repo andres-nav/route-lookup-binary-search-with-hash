@@ -8,20 +8,25 @@
 // TODO try to optimize this functions with pointers
 static uint32_t hash1(uint32_t key, unsigned int table_size) {
   uint32_t hash = key;
-  hash ^= hash >> 16;
+  hash ^= key;
+  hash *= 0x1835a82b;
+  hash ^= key >> 8;
   hash *= 0x85ebca6b;
-  hash ^= hash >> 13;
+  hash ^= key >> 16;
   hash *= 0xc2b2ae35;
-  hash ^= hash >> 16;
+  hash ^= key >> 24;
   return hash % table_size;
 }
 
 static uint32_t hash2(uint32_t key, unsigned int table_size) {
   uint32_t hash = key;
-  hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
-  hash = ((hash >> 16) ^ hash) * 0x01d8fff;
-  hash = ((hash >> 16) ^ hash) * 0xaad003b;
-  hash = (hash >> 16) ^ hash;
+  hash += key >> 24;
+  hash -= 0x0193a48b;
+  hash += key >> 16;
+  hash -= 0x7a11c3e5;
+  hash += key >> 8;
+  hash -= 0x9f1a0306;
+  hash += key;
   return hash % table_size;
 }
 
@@ -59,19 +64,26 @@ struct Table *createTable(char prefix) {
   return table;
 }
 
-char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
+char insertData(struct Table *table, uint32_t ip, enum EntryLabel label,
                 short data) {
   if (table == NULL) {
     return raise(ERROR_EMPTY_POINTER);
   }
 
+  uint32_t key;
+  getPrefix(ip, table->prefix, &key);
+
+  for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
+    uint32_t hash = table->hashFuntion[i](key, table->size);
+
+    if (table->entries[i][hash].key == key) {
+      return ERROR_TABLE_DOUBLE_INSERT;
+    }
+  }
+
   for (unsigned char i = 0; i < MAX_ATTEMPTS; i++) {
     unsigned char index = i % NUMBER_TABLES;
     uint32_t hash = table->hashFuntion[index](key, table->size);
-
-    if (table->entries[index][hash].key == key) {
-      return ERROR_TABLE_DOUBLE_INSERT;
-    }
 
     if (table->entries[index][hash].label == LABEL_DEFAULT) {
       table->entries[index][hash].key = key;
@@ -94,6 +106,10 @@ char insertData(struct Table *table, uint32_t key, enum EntryLabel label,
     }
   }
 
+  char *ip_string = malloc(16 * sizeof(char));
+  getIPString(&ip_string, key);
+  printf("Prefix: %u Key: %s\n", table->prefix, ip_string);
+  free(ip_string);
   return raise(ERROR_TABLE_MAX_ATTEMPTS);
 }
 
@@ -162,12 +178,12 @@ void printTable(struct Table *table) {
       if (entry_array[j].label != LABEL_DEFAULT) {
         char label = entry_array[j].label == LABEL_PREFIX ? 'P' : 'M';
 
-        char *ip = malloc(16 * sizeof(char));
-        getIPString(&ip, entry_array[j].key);
+        char *ip_string = malloc(16 * sizeof(char));
+        getIPString(&ip_string, entry_array[j].key);
 
-        printf("\t\tL:%c K:%s D:%d\n", label, ip, entry_array[j].data);
+        printf("\t\tL:%c K:%s D:%d\n", label, ip_string, entry_array[j].data);
 
-        free(ip);
+        free(ip_string);
       }
     }
   }
