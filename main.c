@@ -1,8 +1,10 @@
 #include "main.h"
+#include "io.h"
 #include "table.h"
 #include "tree.h"
 #include "utils.h"
-#include <stdint.h>
+
+#include <time.h>
 
 static struct Node *generateTree() {
   uint32_t prefix;
@@ -24,11 +26,10 @@ static void fillTreeWithPrefixes(struct Node *root) {
     return;
   }
 
-  uint32_t ip;
-  int prefixLength, outInterface;
-
   resetIO();
 
+  uint32_t ip;
+  int prefixLength, outInterface;
   int previousPrefixLength = -1;
   struct Table *table = NULL;
 
@@ -193,6 +194,31 @@ static unsigned short findLongestMatchingPrefix(struct Node *root,
   return lmp;
 }
 
+static void computeLMPForInputPakcetFile(struct Node *root) {
+  if (root == NULL) {
+    raise(ERROR_NODE_NOT_FOUND);
+    return;
+  }
+
+  resetIO();
+
+  uint32_t ip;
+  unsigned char outInterface;
+  struct timespec initialTime, finalTime;
+  double searchTime;
+
+  while (readInputPacketFileLine(&ip) != REACHED_EOF) {
+    clock_gettime(CLOCK_MONOTONIC_RAW, &initialTime);
+    outInterface = findLongestMatchingPrefix(root, ip);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &finalTime);
+
+    // TODO change search time
+    printOutputLine(ip, outInterface, &initialTime, &finalTime, &searchTime, 0);
+  }
+
+  printMemoryTimeUsage();
+}
+
 int main(int argc, char *argv[]) {
   if (argc != 3) {
     return -1;
@@ -210,6 +236,8 @@ int main(int argc, char *argv[]) {
   fillTreeWithBmp(root);
 
   printTree(root);
+
+  computeLMPForInputPakcetFile(root);
 
   freeTree(root);
 
