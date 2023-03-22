@@ -54,7 +54,7 @@ struct Table *createTable(char prefix) {
 
     table->entries[i]->key = -1;
     table->entries[i]->label = LABEL_DEFAULT;
-    table->entries[i]->data = -1;
+    table->entries[i]->data = EMPTY_DATA;
   }
 
   table->prefix = prefix;
@@ -79,6 +79,11 @@ char insertData(struct Table *table, uint32_t ip, enum EntryLabel label,
 
     if ((table->entries[i][hash].key == key) &&
         (table->entries[i][hash].label != LABEL_DEFAULT)) {
+
+      if ((table->entries[i][hash].label == LABEL_PREFIX) &&
+          (label == LABEL_MARKER)) {
+        table->entries[i][hash].label = LABEL_PREFIX_AND_MARKER;
+      }
       return ERROR_TABLE_DOUBLE_INSERT;
     }
   }
@@ -130,7 +135,7 @@ char deleteData(struct Table *table, uint32_t ip) {
 
   entry->key = -1;
   entry->label = LABEL_DEFAULT;
-  entry->data = -1;
+  entry->data = EMPTY_DATA;
 
   return OK;
 }
@@ -185,14 +190,14 @@ void printTable(struct Table *table) {
 
     for (unsigned int j = 0; j < table->size; j++) {
       if (entry_array[j].label != LABEL_DEFAULT) {
-        char label = entry_array[j].label == LABEL_PREFIX   ? 'P'
-                     : entry_array[j].label == LABEL_MARKER ? 'M'
-                                                            : 'B';
+        char *label = entry_array[j].label == LABEL_PREFIX   ? "P"
+                      : entry_array[j].label == LABEL_MARKER ? "M"
+                                                             : "P&M";
 
         char *ip_string = malloc(16 * sizeof(char));
         getIPString(&ip_string, entry_array[j].key);
 
-        printf("\t\tL:%c K:%s D:%d\n", label, ip_string, entry_array[j].data);
+        printf("\t\tL:%s K:%s D:%d\n", label, ip_string, entry_array[j].data);
 
         free(ip_string);
       }

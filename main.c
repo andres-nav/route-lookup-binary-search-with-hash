@@ -34,7 +34,8 @@ static void fillTreeWithPrefixes(struct Node *root) {
   struct Table *table = NULL;
 
   while (readFIBLine(&ip, &prefixLength, &outInterface) != REACHED_EOF) {
-    if ((outInterface < 0) || (outInterface >= 0xffff)) {
+    if ((outInterface < MIN_OUTPUT_INTERFACE) ||
+        (outInterface > MAX_OUTPUT_INTERFACE)) {
       raise(ERROR_IO_OUTPUT_INTERFACE);
       continue;
     }
@@ -61,7 +62,7 @@ static void addMarkersFromTableToNode(struct Node *node, struct Table *table) {
 
     for (unsigned int j = 0; j < table->size; j++) {
       if (entry_array[j].label != LABEL_DEFAULT) {
-        insertData(node->table, entry_array[j].key, LABEL_MARKER, -1);
+        insertData(node->table, entry_array[j].key, LABEL_MARKER, EMPTY_DATA);
       }
     }
   }
@@ -102,10 +103,10 @@ static unsigned short findBestMatchingPrefix(struct Node *root, uint32_t ip,
                                              unsigned char prefix) {
   if (root == NULL) {
     raise(ERROR_EMPTY_POINTER);
-    return -1; // TODO fix to constant
+    return EMPTY_DATA;
   }
 
-  unsigned short lmp = -1;
+  unsigned short lmp = EMPTY_DATA;
   struct Entry *entry = NULL;
   do {
     if (root->key >= prefix) {
@@ -139,12 +140,12 @@ static void addBMPToTable(struct Table *table, struct Node *root) {
     struct Entry *entry_array = table->entries[i];
 
     for (unsigned int j = 0; j < table->size; j++) {
-      if (entry_array[j].label == LABEL_MARKER) {
+      if ((entry_array[j].label == LABEL_MARKER) &&
+          (entry_array[j].data == EMPTY_DATA)) {
         unsigned short lmp =
             findBestMatchingPrefix(root, entry_array[j].key, table->prefix);
-        if (lmp != 0xff) {
+        if (lmp != EMPTY_DATA) {
           entry_array[j].data = lmp;
-          entry_array[j].label = LABEL_MARKER_WITH_BMP;
         }
       }
     }
@@ -183,6 +184,10 @@ static void findLongestMatchingPrefix(struct Node *root, uint32_t ip,
       root = root->left;
     } else {
       *outInterface = entry->data;
+      if (entry->label == LABEL_PREFIX) {
+        return;
+      }
+
       root = root->right;
     }
   } while (root != NULL);
@@ -204,7 +209,7 @@ static void computeLMPForInputPakcetFile(struct Node *root) {
   unsigned int processedPackets = 0, totalTableAccesses = 0;
 
   while (readInputPacketFileLine(&ip) != REACHED_EOF) {
-    outInterface = -1;
+    outInterface = EMPTY_DATA;
     tableAccesses = 0;
 
     clock_gettime(CLOCK_MONOTONIC_RAW, &initialTime);

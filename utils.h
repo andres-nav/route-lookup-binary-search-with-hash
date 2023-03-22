@@ -13,7 +13,10 @@
  * Constant definitions
  ********************************************************************/
 #define IP_ADDRESS_LENGTH 32
-// TODO define empty constant for -1
+#define EMPTY_DATA 0
+
+#define MIN_OUTPUT_INTERFACE 1
+#define MAX_OUTPUT_INTERFACE 0xffff
 
 enum Error {
   OK = 0,

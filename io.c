@@ -153,8 +153,7 @@ void printOutputLine(uint32_t IPAddress, int outInterface,
   // remember that if no matching but default route is specified in the FIB, the
   // default output interface must be stored to avoid dropping the packet (i.e.,
   // MISS)
-  // TODO change no matching to 0 instead of -1
-  if (outInterface == 0xff) {
+  if (outInterface == EMPTY_DATA) {
     tee(outputFile, "%i.%i.%i.%i;%s;%i;%.0lf\n", IPAddress >> 24,
         (IPAddress >> 16) & 0x000000ff, (IPAddress >> 8) & 0x000000ff,
         IPAddress & 0x000000ff, "MISS", numberOfTableAccesses, *searchingTime);

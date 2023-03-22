@@ -9,7 +9,7 @@ enum EntryLabel {
   LABEL_DEFAULT = 0,
   LABEL_PREFIX = 1,
   LABEL_MARKER = 2,
-  LABEL_MARKER_WITH_BMP = 3,
+  LABEL_PREFIX_AND_MARKER = 3,
 };
 
 struct Entry {
