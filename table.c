@@ -64,6 +64,7 @@ struct Table *createTable(char prefix) {
   return table;
 }
 
+// TODO when max attempt is reached resize the table
 char insertData(struct Table *table, uint32_t ip, enum EntryLabel label,
                 short data) {
   if (table == NULL) {
@@ -94,7 +95,7 @@ char insertData(struct Table *table, uint32_t ip, enum EntryLabel label,
     } else {
       uint32_t tmp_key = table->entries[index][hash].key;
       enum EntryLabel tmp_label = table->entries[index][hash].label;
-      short tmp_data = table->entries[index][hash].data;
+      unsigned short tmp_data = table->entries[index][hash].data;
 
       table->entries[index][hash].key = key;
       table->entries[index][hash].label = label;
@@ -123,9 +124,9 @@ char deleteData(struct Table *table, uint32_t key) {
     return raise(ERROR_TABLE_NO_ENTRY);
   }
 
-  entry->key = 0;
+  entry->key = -1;
   entry->label = LABEL_DEFAULT;
-  entry->data = 0;
+  entry->data = -1;
 
   return OK;
 }
@@ -176,7 +177,9 @@ void printTable(struct Table *table) {
 
     for (unsigned int j = 0; j < table->size; j++) {
       if (entry_array[j].label != LABEL_DEFAULT) {
-        char label = entry_array[j].label == LABEL_PREFIX ? 'P' : 'M';
+        char label = entry_array[j].label == LABEL_PREFIX   ? 'P'
+                     : entry_array[j].label == LABEL_MARKER ? 'M'
+                                                            : 'B';
 
         char *ip_string = malloc(16 * sizeof(char));
         getIPString(&ip_string, entry_array[j].key);

@@ -8,13 +8,14 @@
 enum EntryLabel {
   LABEL_DEFAULT = 0,
   LABEL_PREFIX = 1,
-  LABEL_MARK = 2,
+  LABEL_MARKER = 2,
+  LABEL_MARKER_WITH_BMP = 3,
 };
 
 struct Entry {
   uint32_t key;
   enum EntryLabel label;
-  short data;
+  unsigned short data;
 };
 
 struct Table {
