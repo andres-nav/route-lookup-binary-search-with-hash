@@ -114,10 +114,13 @@ char insertData(struct Table *table, uint32_t ip, enum EntryLabel label,
   return raise(ERROR_TABLE_MAX_ATTEMPTS);
 }
 
-char deleteData(struct Table *table, uint32_t key) {
+char deleteData(struct Table *table, uint32_t ip) {
   if (table == NULL) {
     return raise(ERROR_EMPTY_POINTER);
   }
+
+  uint32_t key;
+  getPrefix(ip, table->prefix, &key);
 
   struct Entry *entry = findEntry(table, key);
   if (entry == NULL) {
@@ -131,11 +134,14 @@ char deleteData(struct Table *table, uint32_t key) {
   return OK;
 }
 
-struct Entry *findEntry(struct Table *table, uint32_t key) {
+struct Entry *findEntry(struct Table *table, uint32_t ip) {
   if (table == NULL) {
     raise(ERROR_EMPTY_POINTER);
     return NULL;
   }
+
+  uint32_t key;
+  getPrefix(ip, table->prefix, &key);
 
   for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
     uint32_t hash = table->hashFuntion[i](key, table->size);

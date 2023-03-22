@@ -46,6 +46,11 @@ static void fillTreeWithPrefixes(struct Node *root) {
 }
 
 static void addMarkersFromTableToNode(struct Node *node, struct Table *table) {
+  if ((node == NULL) || (table == NULL)) {
+    raise(ERROR_EMPTY_POINTER);
+    return;
+  }
+
   for (unsigned char i = 0; i < NUMBER_TABLES; i++) {
     if (table->entries[i] == NULL) {
       continue;
