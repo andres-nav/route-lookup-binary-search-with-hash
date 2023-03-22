@@ -2,8 +2,8 @@
 #include "utils.h"
 
 /* #define TABLE_SIZE_DEFAULT 5000 // number of slots in each table */
-#define TABLE_SIZE_DEFAULT 10 // number of slots in each table
-#define MAX_ATTEMPTS 50       // maximum number of attempts to insert a key
+#define TABLE_SIZE_DEFAULT 10000 // number of slots in each table
+#define MAX_ATTEMPTS 50          // maximum number of attempts to insert a key
 
 // TODO try to optimize this functions with pointers
 static uint32_t hash1(uint32_t key, unsigned int table_size) {

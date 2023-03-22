@@ -34,7 +34,7 @@ static void fillTreeWithPrefixes(struct Node *root) {
   struct Table *table = NULL;
 
   while (readFIBLine(&ip, &prefixLength, &outInterface) != REACHED_EOF) {
-    if ((outInterface < 0) || (outInterface >= 0xff)) {
+    if ((outInterface < 0) || (outInterface >= 0xffff)) {
       raise(ERROR_IO_OUTPUT_INTERFACE);
       continue;
     }
@@ -205,7 +205,8 @@ static void computeLMPForInputPakcetFile(struct Node *root) {
   uint32_t ip;
   unsigned char outInterface;
   struct timespec initialTime, finalTime;
-  double searchTime;
+  double searchTime, totalTime = 0;
+  unsigned int processedPackets = 0;
 
   while (readInputPacketFileLine(&ip) != REACHED_EOF) {
     clock_gettime(CLOCK_MONOTONIC_RAW, &initialTime);
@@ -214,9 +215,11 @@ static void computeLMPForInputPakcetFile(struct Node *root) {
 
     // TODO change search time
     printOutputLine(ip, outInterface, &initialTime, &finalTime, &searchTime, 0);
+    totalTime += searchTime;
+    processedPackets++;
   }
 
-  printMemoryTimeUsage();
+  printSummary(processedPackets, 0, (totalTime / processedPackets));
 }
 
 int main(int argc, char *argv[]) {
@@ -235,12 +238,11 @@ int main(int argc, char *argv[]) {
   fillTreeWithMarkers(root);
   fillTreeWithBmp(root);
 
-  printTree(root);
-
   computeLMPForInputPakcetFile(root);
 
   freeTree(root);
 
   freeIO();
+
   return 0;
 }

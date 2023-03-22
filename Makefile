@@ -10,8 +10,8 @@ CFLAGS = -Wall -g -O3
 VFLAGS = -s --leak-check=full --show-leak-kinds=all --track-origins=yes 
 
 RESOURCES_FOLDER = resources
-FIB_FILE = $(RESOURCES_FOLDER)/routing_table_custom.txt
-INPUT_FILE = $(RESOURCES_FOLDER)/prueba_custom.txt
+FIB_FILE = $(RESOURCES_FOLDER)/routing_table.txt
+INPUT_FILE = $(RESOURCES_FOLDER)/prueba3.txt
 COMMAND = ./$(OUTPUT_FILE) $(FIB_FILE) $(INPUT_FILE)
 
 all: valgrind
@@ -24,7 +24,7 @@ run: compile
 
 valgrind: compile
 	valgrind $(VFLAGS) $(COMMAND)
-	
+
 gdb: compile
 	gdb --args $(COMMAND)
 
