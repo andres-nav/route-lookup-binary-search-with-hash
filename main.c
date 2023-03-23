@@ -173,24 +173,22 @@ static void fillTreeWithBmp(struct Node *root) {
   computeBMPForSubtree(root, root);
 }
 
-static void findLongestMatchingPrefix(struct Node *root, uint32_t ip,
-                                      unsigned short *outInterface,
-                                      unsigned char *tableAccesses) {
+static void findLongestMatchingPrefix(struct LMPInfo *lmpInfo) {
   struct Entry *entry = NULL;
   do {
-    entry = findEntry(root->table, ip);
-    (*tableAccesses)++;
+    entry = findEntry(lmpInfo->root->table, lmpInfo->ip);
+    (*(lmpInfo->tableAccesses))++;
     if (entry == NULL) {
-      root = root->left;
+      lmpInfo->root = lmpInfo->root->left;
     } else {
-      *outInterface = entry->data;
+      *(lmpInfo->outInterface) = entry->data;
       if (entry->label == LABEL_PREFIX) {
         return;
       }
 
-      root = root->right;
+      lmpInfo->root = lmpInfo->root->right;
     }
-  } while (root != NULL);
+  } while (lmpInfo->root != NULL);
 }
 
 static void computeLMPForInputPakcetFile(struct Node *root) {
@@ -203,20 +201,28 @@ static void computeLMPForInputPakcetFile(struct Node *root) {
 
   uint32_t ip;
   unsigned short outInterface;
+
   unsigned char tableAccesses;
+  unsigned int processedPackets = 0, totalTableAccesses = 0;
+
   struct timespec initialTime, finalTime;
   double searchTime, totalTime = 0;
-  unsigned int processedPackets = 0, totalTableAccesses = 0;
+
+  struct LMPInfo lmpInfo;
 
   while (readInputPacketFileLine(&ip) != REACHED_EOF) {
     outInterface = EMPTY_DATA;
-    tableAccesses = 0;
+    tableAccesses = EMPTY_DATA;
+
+    lmpInfo.root = root;
+    lmpInfo.ip = ip;
+    lmpInfo.outInterface = &outInterface;
+    lmpInfo.tableAccesses = &tableAccesses;
 
     clock_gettime(CLOCK_MONOTONIC_RAW, &initialTime);
-    findLongestMatchingPrefix(root, ip, &outInterface, &tableAccesses);
+    findLongestMatchingPrefix(&lmpInfo);
     clock_gettime(CLOCK_MONOTONIC_RAW, &finalTime);
 
-    // TODO change search time
     printOutputLine(ip, outInterface, &initialTime, &finalTime, &searchTime,
                     tableAccesses);
     totalTime += searchTime;
