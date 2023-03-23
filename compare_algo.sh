@@ -8,6 +8,19 @@ i=0
 while IFS=';' read -r ip outInterface tableAccesses time; do
     if [ -z "$ip" ] &&  [ $i -ne -1 ]; then
         ((i=-1))
+        echo "Summary Multibit"
+    fi
+
+    if [ $i -eq -1 ]; then
+        echo $ip
+    fi
+done < $1
+
+((i=0))
+
+while IFS=';' read -r ip outInterface tableAccesses time; do
+    if [ -z "$ip" ] &&  [ $i -ne -1 ]; then
+        ((i=-1))
         echo "Summary Linear Search"
     fi
 
@@ -18,7 +31,7 @@ while IFS=';' read -r ip outInterface tableAccesses time; do
         outInterfaces_ls+=("$outInterface")
         times_ls+=("$time")
     fi
-done < $1
+done < $2
 
 ((i=0))
 
@@ -40,4 +53,4 @@ while IFS=';' read -r ip outInterface tableAccesses time; do
         ((i=i+1))
     fi
 
-done < $2
+done < $3
