@@ -312,5 +312,5 @@ static void printTreeTables(struct Node *node) {
  */
 void printTree(struct Node *root) {
   printNode(root, 0, 'M');
-  // printTreeTables(root);
+  printTreeTables(root);
 }

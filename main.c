@@ -238,14 +238,14 @@ int main(int argc, char *argv[]) {
 
   initializeIO(fib, input);
 
-  struct Node *root = NULL;
-  root = generateTree();
+  struct Node *root = generateTree();
+  if (root == NULL) {
+    return -2;
+  }
 
   fillTreeWithPrefixes(root);
   fillTreeWithMarkers(root);
   fillTreeWithBmp(root);
-
-  printTree(root);
 
   computeLMPForInputPakcetFile(root);
 

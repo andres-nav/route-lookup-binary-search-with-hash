@@ -1,20 +1,29 @@
 MODULES = io.c utils.c table.c tree.c
 SRC = $(MODULES) main.c
-OUTPUT_FILE = my_route_lookup
+OUTPUT_FILE = ./my_route_lookup
 
-TESTS_FOLDER = tests
+TESTS_FOLDER = ./tests
 SRC_TESTS = $(MODULES) $(wildcard $(TESTS_FOLDER)/*.c) 
 OUTPUT_FILE_TESTS = $(TESTS_FOLDER)/test
 
 CFLAGS = -Wall -g -O3
 VFLAGS = -s --leak-check=full --show-leak-kinds=all --track-origins=yes 
 
-RESOURCES_FOLDER = resources
+RESOURCES_FOLDER = ./resources
 FIB_FILE = $(RESOURCES_FOLDER)/routing_table.txt
 INPUT_FILE = $(RESOURCES_FOLDER)/prueba3.txt
-COMMAND = ./$(OUTPUT_FILE) $(FIB_FILE) $(INPUT_FILE)
 
-all: valgrind
+LINEAR_SEARCH_FILE = ./$(RESOURCES_FOLDER)/linearSearch
+RESULT_FILE = $(INPUT_FILE).out
+LINEAR_SEARCH_RESULT_FILE = $(RESULT_FILE).ls
+
+COMPARE_FILE = ./compare_algo.sh
+
+COMMAND = $(OUTPUT_FILE) $(FIB_FILE) $(INPUT_FILE)
+COMMAND_LINEAR_SEARCH = $(LINEAR_SEARCH_FILE) $(FIB_FILE) $(INPUT_FILE)
+COMMAND_COMPARE = $(COMPARE_FILE) $(LINEAR_SEARCH_RESULT_FILE) $(RESULT_FILE)
+
+all: run
 
 compile: $(SRC)
 	gcc $(CFLAGS) $(SRC) -o $(OUTPUT_FILE) -lm
@@ -35,5 +44,12 @@ clean:
 compile_tests: $(SRC_TESTS) 
 	gcc $(CFLAGS) $(SRC_TESTS) -o $(OUTPUT_FILE_TESTS) -lm
 
-test: compile_tests
-	./$(OUTPUT_FILE_TESTS)
+run_tests: compile_tests
+	$(OUTPUT_FILE_TESTS)
+
+test: compile
+	$(COMMAND_LINEAR_SEARCH) &> /dev/null
+	mv $(RESULT_FILE) $(LINEAR_SEARCH_RESULT_FILE) &> /dev/null
+	$(COMMAND) &> /dev/null
+
+	$(COMMAND_COMPARE)
