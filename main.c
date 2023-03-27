@@ -216,7 +216,6 @@ static void computeLMPForInputPakcetFile(struct Node *root) {
     findLongestMatchingPrefix(root, ip, &outInterface, &tableAccesses);
     clock_gettime(CLOCK_MONOTONIC_RAW, &finalTime);
 
-    // TODO change search time
     printOutputLine(ip, outInterface, &initialTime, &finalTime, &searchTime,
                     tableAccesses);
     totalTime += searchTime;

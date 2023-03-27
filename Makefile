@@ -6,8 +6,9 @@ TESTS_FOLDER = ./tests
 SRC_TESTS = $(MODULES) $(wildcard $(TESTS_FOLDER)/*.c) 
 OUTPUT_FILE_TESTS = $(TESTS_FOLDER)/test
 
-CFLAGS = -Wall -g -O3
+CFLAGS = -Wall -g -Ofast
 VFLAGS = -s --leak-check=full --show-leak-kinds=all --track-origins=yes 
+
 
 RESOURCES_FOLDER = ./resources
 FIB_FILE = $(RESOURCES_FOLDER)/routing_table.txt
