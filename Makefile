@@ -9,10 +9,9 @@ OUTPUT_FILE_TESTS = $(TESTS_FOLDER)/test
 CFLAGS = -Wall -g -Ofast
 VFLAGS = -s --leak-check=full --show-leak-kinds=all --track-origins=yes 
 
-
 RESOURCES_FOLDER = ./resources
 FIB_FILE = $(RESOURCES_FOLDER)/routing_table.txt
-INPUT_FILE = $(RESOURCES_FOLDER)/prueba3.txt
+INPUT_FILE = $(RESOURCES_FOLDER)/prueba2.txt
 RESULT_FILE = $(INPUT_FILE).out
 
 MULTIBIT_FILE = ./$(RESOURCES_FOLDER)/multiBit

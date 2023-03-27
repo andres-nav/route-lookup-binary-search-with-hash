@@ -230,7 +230,7 @@ static void computeLMPForInputPakcetFile(struct Node *root) {
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
-    return -1;
+    return raise(ERROR_WRONG_ARGS);
   }
   char *fib = argv[1];
   char *input = argv[2];
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
 
   struct Node *root = generateTree();
   if (root == NULL) {
-    return -2;
+    return raise(ERROR_EMPTY_POINTER);
   }
 
   fillTreeWithPrefixes(root);
@@ -252,5 +252,5 @@ int main(int argc, char *argv[]) {
 
   freeIO();
 
-  return 0;
+  return OK;
 }

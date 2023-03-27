@@ -65,6 +65,9 @@ enum Error raise(enum Error error) {
   case ERROR_WRONG_PREFIX:
     printError("The prefix given is hiehger than 32 or lower than 0");
     break;
+  case ERROR_WRONG_ARGS:
+    printError("Please pass the fib file and the input files as arguments");
+    break;
 
   case ERROR_TABLE_DOUBLE_INSERT:
     printError("Trying to insert a key in a table that is already there");
