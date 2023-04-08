@@ -33,7 +33,7 @@ This algorithm is built around a binary tree with hashing (to store the informat
 2. Calculate the markers for each right subtree.
 3. Compute for every marker the best matching prefix.
 
-*NOTE:* The prefixes are the ones that appear in the FIB (routing that we want to do), the markers are like hints that tell us that there might me a longer prefix match at the right side of the tree, and the best matching prefix are the longest matching prefix for the marker if we don't find any longer at the right side.
+*NOTE:* The prefixes are the ones that appear in the FIB (routing that we want to do), the markers are like hints that tell us that there might be a longer prefix match at the right side of the tree, and the best matching prefix are the longest matching prefix for the marker if we don't find any longer at the right side.
 
 *** How does it find the LMP?
 
