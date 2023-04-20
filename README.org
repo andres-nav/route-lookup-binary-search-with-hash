@@ -25,7 +25,7 @@ Finally also there has been developed some unit test to check the functionality 
 
 ** Algorithm
 
-*** How is build the tree?
+*** How is built the tree?
 
 This algorithm is built around a binary tree with hashing (to store the information). The binary tree used is the AVL tree as it is self balancing, and the hashing method is Cucko Hashing with two tables (but it can be extended). The steps that this algorithm takes are the following:
 
